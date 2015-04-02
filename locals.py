@@ -52,8 +52,9 @@ class LocalsFinder:
     self.setup_initial_matches()
     
     try:
+      max_tries = 10000
       current_pos = 0
-      while True:
+      while True and max_tries > 0:
         name, match = self.rematch(current_pos)
         if not match:
           break
@@ -62,7 +63,12 @@ class LocalsFinder:
           break
         
         current_pos = self.dispatch(name, match)
+        max_tries = max_tries - 1
+
+      if max_tries < 1:
+        print('failed max_tries in run, ', self.matches)
     except StopParsing:
+      print('stopped parsing', max_tries)
       pass
     
     curscope = self.scope_stack[-1]
@@ -190,10 +196,15 @@ class LocalsFinder:
     str_char = match.group(0) # single or double quotes?
     str_end = match.end()
     
-    while self.code[str_end] != str_char or self.code[str_end-1] == "\\": # Keep looking for unescaped terminator
+    max_tries = 10000
+    while self.code[str_end] != str_char or self.code[str_end - 1] == "\\": # Keep looking for unescaped terminator
       str_end = self.code.find(str_char, str_end+1)
-      if str_end == -1:
+      if str_end == -1 or max_tries < 0:
+        print('!! Parsing error in handle_string')
+        logging.debug('!! Parsing error in handle_string')
         raise StopParsing() # EOF
+      
+      max_tries = max_tries - 1
     
     return str_end+1
   
@@ -218,4 +229,6 @@ if __name__ == "__main__":
   for i in range(1):
     scope = finder.run(loc)
     if i == 0:
-      print(scope)
+      pass
+      # print(scope)
+      # print('')

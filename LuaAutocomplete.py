@@ -30,7 +30,7 @@ class LocalsAutocomplete(sublime_plugin.EventListener):
     return True
   
   def on_query_completions(self, view, prefix, locations):
-    if view.settings().get("syntax") != "Packages/Lua/Lua.tmLanguage":
+    if view.settings().get("syntax").index('Lua') < 0:
       # Not Lua, don't do anything.
       return
     
@@ -44,7 +44,7 @@ class LocalsAutocomplete(sublime_plugin.EventListener):
     localsfinder = LocalsFinder(src)
     varz = localsfinder.run(location)
     
-    return [(name+"\t"+data.vartype,name) for name, data in varz.items()], sublime.INHIBIT_WORD_COMPLETIONS
+    return [(name+"\t"+data.vartype, name) for name, data in varz.items()], sublime.INHIBIT_WORD_COMPLETIONS
 
 class RequireAutocomplete(sublime_plugin.EventListener):
   
@@ -56,7 +56,7 @@ class RequireAutocomplete(sublime_plugin.EventListener):
         yield fname
   
   def on_query_completions(self, view, prefix, locations):
-    if view.settings().get("syntax") != "Packages/Lua/Lua.tmLanguage":
+    if view.settings().get("syntax").index('Lua') < 0:
       # Not Lua, don't do anything.
       return
     
@@ -68,7 +68,7 @@ class RequireAutocomplete(sublime_plugin.EventListener):
     location = locations[0]
     src = view.substr(sublime.Region(0, location))
     
-    match = re.search(r"""require\s*\(?\s*["']([^"]*)$""", src)
+    match = re.search(r"""require\s*\(?\s*["']([^"']*)$""", src)
     if not match:
       return
     
@@ -80,7 +80,7 @@ class RequireAutocomplete(sublime_plugin.EventListener):
     for proj_subdir in view.window().project_data()["folders"]:
       proj_subdir = proj_subdir["path"]
       cur_path = os.path.join(proj_dir, proj_subdir, *(module_path[:-1]))
-      print("curpath:", cur_path)
+      print("curpath: ", cur_path)
       if not os.path.exists(cur_path) or not os.path.isdir(cur_path):
         continue
       
