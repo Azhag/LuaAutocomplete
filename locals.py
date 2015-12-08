@@ -33,7 +33,7 @@ class LocalsFinder:
     ("longcomment",     re.compile(r"\-\-\[(=*)\[")),
     ("comment",         re.compile(r"\-\-")),
     ("string",          re.compile(r"""(?:"|')""")),
-    ("longstring",      re.compile(r"\[(=*)\[")),
+    ("longstring",      re.compile(r"\[(=*)\[\{")),
   ])
   
   def __init__(self, code):
